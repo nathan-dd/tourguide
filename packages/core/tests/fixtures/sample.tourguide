@@ -1,0 +1,121 @@
+{
+  "$schema": "https://tourguide.dev/schema/tourguide.schema.json",
+  "version": "1.0.0",
+  "title": "Sample tour",
+  "description": "Sample valid tour",
+  "mode": "diff",
+  "baseRef": "main",
+  "headRef": "HEAD",
+  "overview": {
+    "summary": "Sample overview",
+    "diagram": "graph LR\\nA-->B",
+    "fileMap": [
+      {
+        "file": "src/entry.ts",
+        "description": "Entry file",
+        "relevance": "primary"
+      },
+      {
+        "file": "src/helper.ts",
+        "description": "Helper",
+        "relevance": "secondary"
+      }
+    ]
+  },
+  "chapters": [
+    {
+      "id": "chapter-1",
+      "title": "Routing",
+      "summary": "Routing logic",
+      "steps": [
+        {
+          "id": "step-1",
+          "file": "src/entry.ts",
+          "range": {
+            "start": {
+              "line": 1,
+              "character": 0
+            },
+            "end": {
+              "line": 5,
+              "character": 0
+            }
+          },
+          "title": "Entry point",
+          "description": "Starts the flow",
+          "kind": "entry-point",
+          "chapter": "chapter-1",
+          "connections": [
+            {
+              "from": "step-1",
+              "to": "step-2",
+              "type": "calls"
+            }
+          ],
+          "annotationRefs": [
+            "ann-1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chapter-2",
+      "title": "Helper",
+      "summary": "Helper logic",
+      "steps": [
+        {
+          "id": "step-2",
+          "file": "src/helper.ts",
+          "range": {
+            "start": {
+              "line": 1,
+              "character": 0
+            },
+            "end": {
+              "line": 4,
+              "character": 0
+            }
+          },
+          "pattern": "function helper",
+          "title": "Helper function",
+          "description": "Handles helper work",
+          "kind": "utility",
+          "chapter": "chapter-2",
+          "connections": [],
+          "annotationRefs": []
+        }
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "id": "ann-1",
+      "file": "src/entry.ts",
+      "range": {
+        "start": {
+          "line": 1,
+          "character": 0
+        },
+        "end": {
+          "line": 1,
+          "character": 8
+        }
+      },
+      "content": "Starts flow",
+      "kind": "entry-point",
+      "category": "entry-point"
+    }
+  ],
+  "connections": [
+    {
+      "from": "step-1",
+      "to": "step-2",
+      "type": "calls"
+    },
+    {
+      "from": "step-2",
+      "to": "ann-1",
+      "type": "returns-to"
+    }
+  ]
+}

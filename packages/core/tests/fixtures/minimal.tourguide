@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "title": "Minimal tour",
+  "description": "Minimal valid tour",
+  "mode": "codebase",
+  "ref": "main",
+  "overview": {
+    "summary": "Overview",
+    "fileMap": [
+      {
+        "file": "src/file.ts",
+        "description": "Primary file",
+        "relevance": "primary"
+      }
+    ]
+  },
+  "chapters": [
+    {
+      "id": "chapter-1",
+      "title": "Chapter 1",
+      "summary": "Summary",
+      "steps": [
+        {
+          "id": "step-1",
+          "file": "src/file.ts",
+          "range": {
+            "start": {
+              "line": 1,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 1
+            }
+          },
+          "title": "Step 1",
+          "description": "Description",
+          "kind": "utility",
+          "chapter": "chapter-1",
+          "connections": [],
+          "annotationRefs": []
+        }
+      ]
+    }
+  ],
+  "annotations": [],
+  "connections": []
+}

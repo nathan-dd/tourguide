@@ -1,0 +1,26 @@
+{
+  "name": "tourguide",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Guided code understanding generation and visualization system",
+  "license": "MIT",
+  "packageManager": "pnpm@10.17.1",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' build",
+    "test": "pnpm -r --filter './packages/*' test",
+    "lint": "pnpm -r --filter './packages/*' lint",
+    "check": "pnpm build && pnpm test && pnpm lint"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^25.5.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
+    "zod": "^3.24.1",
+    "zod-to-json-schema": "^3.24.1"
+  }
+}

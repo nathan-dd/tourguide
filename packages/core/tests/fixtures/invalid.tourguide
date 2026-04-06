@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "title": "Invalid tour",
+  "description": "Invalid fixture",
+  "mode": "diff",
+  "baseRef": "main",
+  "headRef": "HEAD",
+  "overview": {
+    "summary": "Overview",
+    "fileMap": []
+  },
+  "chapters": [
+    {
+      "id": "chapter-1",
+      "title": "Bad chapter",
+      "summary": "Summary",
+      "steps": [
+        {
+          "id": "step-1",
+          "file": "src/a.ts",
+          "range": {
+            "start": {
+              "line": 1,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 0
+            }
+          },
+          "title": "Step",
+          "description": "Invalid chapter ref",
+          "kind": "utility",
+          "chapter": "missing-chapter",
+          "connections": [],
+          "annotationRefs": [
+            "missing-ann"
+          ]
+        }
+      ]
+    }
+  ],
+  "annotations": [],
+  "connections": [
+    {
+      "from": "step-1",
+      "to": "missing-step",
+      "type": "calls"
+    }
+  ]
+}
