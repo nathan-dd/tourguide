@@ -11,14 +11,23 @@ export type TourProgress = {
   overallStep: { current: number; total: number };
 };
 
-export function firstPosition(_tour: Tour): TourPosition {
-  return { chapterIndex: 0, stepIndex: 0 };
+export function firstPosition(tour: Tour): TourPosition | null {
+  for (let chapterIndex = 0; chapterIndex < tour.chapters.length; chapterIndex += 1) {
+    if (tour.chapters[chapterIndex].steps.length > 0) {
+      return { chapterIndex, stepIndex: 0 };
+    }
+  }
+  return null;
 }
 
-export function lastPosition(tour: Tour): TourPosition {
-  const chapterIndex = Math.max(0, tour.chapters.length - 1);
-  const stepIndex = Math.max(0, tour.chapters[chapterIndex]?.steps.length - 1);
-  return { chapterIndex, stepIndex };
+export function lastPosition(tour: Tour): TourPosition | null {
+  for (let chapterIndex = tour.chapters.length - 1; chapterIndex >= 0; chapterIndex -= 1) {
+    const steps = tour.chapters[chapterIndex].steps;
+    if (steps.length > 0) {
+      return { chapterIndex, stepIndex: steps.length - 1 };
+    }
+  }
+  return null;
 }
 
 export function getChapter(tour: Tour, position: TourPosition): Chapter {
@@ -63,26 +72,39 @@ export function prevStep(tour: Tour, position: TourPosition): TourPosition | nul
 }
 
 export function nextChapter(tour: Tour, position: TourPosition): TourPosition | null {
-  const chapterIndex = position.chapterIndex + 1;
-  if (chapterIndex >= tour.chapters.length) {
-    return null;
+  for (
+    let chapterIndex = position.chapterIndex + 1;
+    chapterIndex < tour.chapters.length;
+    chapterIndex += 1
+  ) {
+    if (tour.chapters[chapterIndex].steps.length > 0) {
+      return { chapterIndex, stepIndex: 0 };
+    }
   }
-  return { chapterIndex, stepIndex: 0 };
+  return null;
 }
 
 export function prevChapter(tour: Tour, position: TourPosition): TourPosition | null {
-  const chapterIndex = position.chapterIndex - 1;
-  if (chapterIndex < 0) {
-    return null;
+  for (let chapterIndex = position.chapterIndex - 1; chapterIndex >= 0; chapterIndex -= 1) {
+    if (tour.chapters[chapterIndex].steps.length > 0) {
+      return { chapterIndex, stepIndex: 0 };
+    }
   }
-  return { chapterIndex, stepIndex: 0 };
+  return null;
 }
 
 export function totalSteps(tour: Tour): number {
   return tour.chapters.reduce((sum, chapter) => sum + chapter.steps.length, 0);
 }
 
-export function getProgress(tour: Tour, position: TourPosition): TourProgress {
+export function getProgress(tour: Tour, position: TourPosition | null): TourProgress {
+  if (!position) {
+    return {
+      chapter: { current: 0, total: tour.chapters.length },
+      chapterStep: { current: 0, total: 0 },
+      overallStep: { current: 0, total: totalSteps(tour) },
+    };
+  }
   return {
     chapter: {
       current: position.chapterIndex + 1,
