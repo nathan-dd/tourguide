@@ -1,0 +1,183 @@
+{
+  "$schema": "https://tourguide.dev/schema/tourguide.schema.json",
+  "version": "1.0.0",
+  "title": "Touring tourguide format core",
+  "description": "Self-documenting example tour over the format package.",
+  "mode": "codebase",
+  "ref": "main",
+  "generatedBy": {
+    "tool": "tourguide",
+    "version": "0.1.0"
+  },
+  "overview": {
+    "summary": "This tour explains how the format schema is defined and validated.",
+    "diagram": "graph LR\\nSchema-->Validate\\nValidate-->Core",
+    "fileMap": [
+      {
+        "file": "packages/format/src/schema.ts",
+        "description": "Defines the core zod schemas for .tourguide data.",
+        "relevance": "primary"
+      },
+      {
+        "file": "packages/format/src/validate.ts",
+        "description": "Adds semantic validation and user-facing errors.",
+        "relevance": "primary"
+      },
+      {
+        "file": "packages/core/src/loader.ts",
+        "description": "Parses and validates tours for consumers.",
+        "relevance": "secondary"
+      }
+    ]
+  },
+  "chapters": [
+    {
+      "id": "chapter-format",
+      "title": "Format contract",
+      "summary": "Understand the schema and validator surface.",
+      "steps": [
+        {
+          "id": "step-format-schema",
+          "file": "packages/format/src/schema.ts",
+          "range": {
+            "start": {
+              "line": 1,
+              "character": 0
+            },
+            "end": {
+              "line": 1,
+              "character": 20
+            }
+          },
+          "title": "Schema entry",
+          "description": "The format starts with zod schema declarations.",
+          "kind": "type-definition",
+          "chapter": "chapter-format",
+          "connections": [
+            {
+              "from": "step-format-schema",
+              "to": "step-format-validate",
+              "type": "configures",
+              "description": "Validation depends on this schema."
+            }
+          ],
+          "annotationRefs": [
+            "ann-schema"
+          ]
+        },
+        {
+          "id": "step-format-validate",
+          "file": "packages/format/src/schema.ts",
+          "range": {
+            "start": {
+              "line": 9999,
+              "character": 0
+            },
+            "end": {
+              "line": 9999,
+              "character": 1
+            }
+          },
+          "pattern": "export const tourSchema",
+          "title": "Tour union schema",
+          "description": "Diff and codebase modes are unified here.",
+          "kind": "utility",
+          "chapter": "chapter-format",
+          "connections": [
+            {
+              "from": "step-format-validate",
+              "to": "step-loader",
+              "type": "calls"
+            }
+          ],
+          "annotationRefs": []
+        }
+      ]
+    },
+    {
+      "id": "chapter-core",
+      "title": "Core consumption",
+      "summary": "How the core package consumes validated tours.",
+      "steps": [
+        {
+          "id": "step-loader",
+          "file": "packages/core/src/loader.ts",
+          "range": {
+            "start": {
+              "line": 1,
+              "character": 0
+            },
+            "end": {
+              "line": 4,
+              "character": 40
+            }
+          },
+          "title": "Loader API",
+          "description": "loadTour and parseTour are entry points for consumers.",
+          "kind": "entry-point",
+          "chapter": "chapter-core",
+          "connections": [],
+          "annotationRefs": [
+            "ann-loader"
+          ]
+        }
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "id": "ann-schema",
+      "file": "packages/format/src/schema.ts",
+      "range": {
+        "start": {
+          "line": 1,
+          "character": 0
+        },
+        "end": {
+          "line": 1,
+          "character": 20
+        }
+      },
+      "content": "Schema definitions drive every downstream consumer.",
+      "kind": "type-definition",
+      "category": "context"
+    },
+    {
+      "id": "ann-loader",
+      "file": "packages/core/src/loader.ts",
+      "range": {
+        "start": {
+          "line": 1,
+          "character": 0
+        },
+        "end": {
+          "line": 1,
+          "character": 20
+        }
+      },
+      "content": "Loader turns JSON into typed, validated tour objects.",
+      "kind": "entry-point",
+      "category": "data-flow"
+    }
+  ],
+  "connections": [
+    {
+      "from": "step-format-schema",
+      "to": "step-format-validate",
+      "type": "configures",
+      "description": "Schema structure feeds validator behavior."
+    },
+    {
+      "from": "step-format-validate",
+      "to": "step-loader",
+      "type": "calls",
+      "description": "Loader delegates to format validation."
+    },
+    {
+      "from": "step-loader",
+      "to": "ann-loader",
+      "type": "returns-to",
+      "description": "Annotation provides loader context."
+    }
+  ]
+}
