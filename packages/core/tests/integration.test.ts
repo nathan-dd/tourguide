@@ -11,8 +11,11 @@ describe('integration', () => {
     const tour = await loadTour(resolve(process.cwd(), '../../examples/sample.tourguide'));
     const start = firstPosition(tour);
     expect(start).not.toBeNull();
-    const first = getStep(tour, start!);
-    const secondPosition = nextStep(tour, start!);
+    if (!start) {
+      return;
+    }
+    const first = getStep(tour, start);
+    const secondPosition = nextStep(tour, start);
 
     expect(first.id).toBe('step-format-schema');
     expect(secondPosition).not.toBeNull();

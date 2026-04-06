@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
 import type { Tour } from '@tourguide/format';
+import { describe, expect, it } from 'vitest';
 import { parseTour } from '../src/loader';
 import {
   firstPosition,
@@ -90,28 +90,58 @@ describe('traversal', () => {
   });
 
   it('advances and retreats across chapter boundaries', () => {
-    const start = firstPosition(sampleTour)!;
+    const maybeStart = firstPosition(sampleTour);
+    expect(maybeStart).not.toBeNull();
+    if (!maybeStart) {
+      return;
+    }
+    const start = maybeStart;
     const second = nextStep(sampleTour, start);
     expect(second).toEqual({ chapterIndex: 1, stepIndex: 0 });
-    expect(prevStep(sampleTour, second!)).toEqual(start);
+    expect(second).not.toBeNull();
+    if (!second) {
+      return;
+    }
+    expect(prevStep(sampleTour, second)).toEqual(start);
   });
 
   it('jumps by chapter', () => {
-    const start = firstPosition(sampleTour)!;
+    const maybeStart = firstPosition(sampleTour);
+    expect(maybeStart).not.toBeNull();
+    if (!maybeStart) {
+      return;
+    }
+    const start = maybeStart;
     const next = nextChapter(sampleTour, start);
     expect(next).toEqual({ chapterIndex: 1, stepIndex: 0 });
-    expect(prevChapter(sampleTour, next!)).toEqual(start);
+    expect(next).not.toBeNull();
+    if (!next) {
+      return;
+    }
+    expect(prevChapter(sampleTour, next)).toEqual(start);
   });
 
   it('returns null at boundaries', () => {
-    const start = firstPosition(sampleTour)!;
-    const end = lastPosition(sampleTour)!;
+    const maybeStart = firstPosition(sampleTour);
+    const maybeEnd = lastPosition(sampleTour);
+    expect(maybeStart).not.toBeNull();
+    expect(maybeEnd).not.toBeNull();
+    if (!maybeStart || !maybeEnd) {
+      return;
+    }
+    const start = maybeStart;
+    const end = maybeEnd;
     expect(prevStep(sampleTour, start)).toBeNull();
     expect(nextStep(sampleTour, end)).toBeNull();
   });
 
   it('returns current chapter, step and progress', () => {
-    const pos = firstPosition(sampleTour)!;
+    const maybePos = firstPosition(sampleTour);
+    expect(maybePos).not.toBeNull();
+    if (!maybePos) {
+      return;
+    }
+    const pos = maybePos;
     expect(getChapter(sampleTour, pos).id).toBe('chapter-1');
     expect(getStep(sampleTour, pos).id).toBe('step-1');
     expect(getProgress(sampleTour, pos)).toEqual({
@@ -151,19 +181,34 @@ describe('traversal — empty chapters', () => {
   });
 
   it('nextChapter skips empty chapters', () => {
-    const start = firstPosition(tourWithEmptyChapters)!;
+    const maybeStart = firstPosition(tourWithEmptyChapters);
+    expect(maybeStart).not.toBeNull();
+    if (!maybeStart) {
+      return;
+    }
+    const start = maybeStart;
     const next = nextChapter(tourWithEmptyChapters, start);
     expect(next).toEqual({ chapterIndex: 3, stepIndex: 0 });
   });
 
   it('prevChapter skips empty chapters', () => {
-    const end = lastPosition(tourWithEmptyChapters)!;
+    const maybeEnd = lastPosition(tourWithEmptyChapters);
+    expect(maybeEnd).not.toBeNull();
+    if (!maybeEnd) {
+      return;
+    }
+    const end = maybeEnd;
     const prev = prevChapter(tourWithEmptyChapters, end);
     expect(prev).toEqual({ chapterIndex: 1, stepIndex: 0 });
   });
 
   it('nextStep crosses empty chapters', () => {
-    const start = firstPosition(tourWithEmptyChapters)!;
+    const maybeStart = firstPosition(tourWithEmptyChapters);
+    expect(maybeStart).not.toBeNull();
+    if (!maybeStart) {
+      return;
+    }
+    const start = maybeStart;
     const next = nextStep(tourWithEmptyChapters, start);
     expect(next).toEqual({ chapterIndex: 3, stepIndex: 0 });
   });

@@ -1,8 +1,53 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import type { Tour } from '@tourguide/format';
 import { describe, expect, it } from 'vitest';
 import { buildGraph, resolveNode } from '../src/graph';
 import { parseTour } from '../src/loader';
+
+function makeTourWithPerStepConnections(): Tour {
+  return {
+    version: '1.0.0',
+    title: 'Per-step connections',
+    description: 'Test',
+    mode: 'codebase',
+    ref: 'main',
+    overview: { summary: 'Test', fileMap: [] },
+    chapters: [
+      {
+        id: 'ch-1',
+        title: 'Ch 1',
+        summary: 'S',
+        steps: [
+          {
+            id: 's-1',
+            file: 'a.ts',
+            range: { start: { line: 1, character: 0 }, end: { line: 2, character: 0 } },
+            title: 'S1',
+            description: 'D',
+            kind: 'utility',
+            chapter: 'ch-1',
+            connections: [{ from: 's-1', to: 's-2', type: 'calls' }],
+            annotationRefs: [],
+          },
+          {
+            id: 's-2',
+            file: 'b.ts',
+            range: { start: { line: 1, character: 0 }, end: { line: 2, character: 0 } },
+            title: 'S2',
+            description: 'D',
+            kind: 'utility',
+            chapter: 'ch-1',
+            connections: [],
+            annotationRefs: [],
+          },
+        ],
+      },
+    ],
+    annotations: [],
+    connections: [],
+  } as Tour;
+}
 
 const sampleTour = parseTour(
   readFileSync(resolve(process.cwd(), 'tests/fixtures/sample.tourguide'), 'utf8'),
@@ -43,5 +88,31 @@ describe('graph', () => {
     const graph = buildGraph(sampleTour);
     expect(graph.outgoing('ann-1')).toEqual([]);
     expect(graph.incoming('step-1')).toEqual([]);
+  });
+});
+
+describe('buildGraph — per-step connections', () => {
+  it('indexes connections defined only on steps', () => {
+    const tour = makeTourWithPerStepConnections();
+    const graph = buildGraph(tour);
+    expect(graph.outgoing('s-1')).toHaveLength(1);
+    expect(graph.outgoing('s-1')[0].type).toBe('calls');
+    expect(graph.incoming('s-2')).toHaveLength(1);
+  });
+
+  it('deduplicates overlapping top-level and per-step connections', () => {
+    const graph = buildGraph(sampleTour);
+    // sampleTour has step-1→step-2 (calls) both per-step and top-level
+    const outgoing = graph.outgoing('step-1');
+    const callsToStep2 = outgoing.filter((c) => c.to === 'step-2' && c.type === 'calls');
+    expect(callsToStep2).toHaveLength(1);
+  });
+
+  it('resolves related nodes from per-step connections', () => {
+    const tour = makeTourWithPerStepConnections();
+    const graph = buildGraph(tour);
+    const related = graph.related('s-1');
+    expect(related).toHaveLength(1);
+    expect(related[0].node.id).toBe('s-2');
   });
 });
