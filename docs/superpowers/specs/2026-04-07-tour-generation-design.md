@@ -39,7 +39,7 @@ CLI (parse flags, resolve refs)
     → AI SDK: discovery call (generateText + tools)
       → tools execute against local git repo
     ← discovery synthesis (free-form text)
-    → AI SDK: narration call (generateObject + tourSchema)
+    → AI SDK: narration call (generateText + Output.object + tourSchema)
     ← tour object (Zod-validated)
   → semantic validation via @tourguide/format
   → stdout or --output file
@@ -61,7 +61,7 @@ The generation code never calls provider APIs directly. It uses the Vercel AI SD
 
 **Why the AI SDK over direct SDKs or a custom abstraction:**
 - Tool use normalization across providers is genuinely hard. Anthropic's native tool use, OpenAI's function calling, and Google's function declarations all become the same interface. This is critical for the agentic loop.
-- `generateText` with tools + `maxSteps` handles the discovery agent loop. `generateObject` with a Zod schema handles the narration call with schema enforcement.
+- `generateText` with tools + `stopWhen: stepCountIs(N)` handles the discovery agent loop. `generateText` with `output: Output.object({ schema })` handles the narration call with schema enforcement.
 - Provider packages are separate (`@ai-sdk/anthropic`, `@ai-sdk/openai`). Users only install what they use. Adding a provider is a dependency, not a code change.
 
 ## The Two-Call Pipeline
@@ -86,11 +86,11 @@ The discovery prompt has no knowledge of the tourguide format. It's pure compreh
 
 All tools are read-only and execute against the local git repo.
 
-**Stopping:** The AI SDK's `maxSteps` parameter caps tool-use rounds (default: 25). The model naturally converges — once it understands the changes, it stops calling tools and produces its synthesis.
+**Stopping:** The AI SDK's `stopWhen: stepCountIs(N)` parameter caps tool-use rounds (default: 25). The model naturally converges — once it understands the changes, it stops calling tools and produces its synthesis.
 
 **Output:** The final text message — a free-form synthesis of what changed, why, how the pieces connect, and what deserves attention. This is internal to the pipeline; the user never sees it.
 
-### Call 2: Narration (generateObject + tourSchema)
+### Call 2: Narration (generateText + Output.object + tourSchema)
 
 The narration model receives:
 1. A system prompt explaining its role as a tour author
@@ -100,12 +100,14 @@ The narration model receives:
 
 **System prompt intent:** "You are writing a guided tour of a PR for a code reviewer. Organize the material into an engaging walkthrough. Explain *why*, not just *what*. Group by conceptual theme, not file order. Skip boilerplate. Output must match the schema."
 
-**Schema enforcement:** `generateObject` with the `tourSchema` from `@tourguide/format`. The AI SDK enforces the schema at the provider level. The existing Zod schema — including discriminated unions, nested chapters/steps/annotations/connections — is passed directly.
+**Schema enforcement:** `generateText` with `output: Output.object({ schema: tourSchema })` from the AI SDK. This replaces the deprecated `generateObject` API. The AI SDK enforces the schema at the provider level. The existing Zod schema — including discriminated unions, nested chapters/steps/annotations/connections — is passed directly.
 
 **Provenance:** The generated tour's `generatedBy` field is populated automatically: `tool: "tourguide"`, `version` from `package.json`, `model` from the narration model identifier, and `metadata` with the diff range and discovery step count.
 
 **Why two calls, not one:**
 The discovery model thinks like a reader — curious, exploratory, following threads. The narration model thinks like a writer — organizing, structuring, making editorial decisions. One combined prompt leads to the model cutting exploration short to start structuring, or over-exploring because it hasn't committed to a structure. Separating the roles gives each call a clear objective.
+
+Note: while the AI SDK supports combining tools + structured output in a single `generateText` call, the separation into two calls is intentional for the reasons above. The discovery call uses tools only; the narration call uses `Output.object()` only.
 
 ## CLI Interface
 
@@ -134,7 +136,7 @@ tourguide generate --diff base..head [options]
 
 ## Validation, Retry, and Error Handling
 
-**Validation pipeline:** After `generateObject` produces a tour, run it through `@tourguide/format`'s `validate()` to catch semantic errors (dangling chapter references, broken connection endpoints, invalid annotation refs) that the Zod schema alone can't express.
+**Validation pipeline:** After the narration call produces a tour, run it through `@tourguide/format`'s `validate()` to catch semantic errors (dangling chapter references, broken connection endpoints, invalid annotation refs) that the Zod schema alone can't express.
 
 **Retry:** If semantic validation fails, retry the narration call once, appending the validation errors: "Your previous output had these errors: [list]. Fix them." One retry only. The discovery phase is not re-run (it's expensive and the problem is in narration).
 
