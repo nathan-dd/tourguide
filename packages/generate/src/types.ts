@@ -11,6 +11,8 @@ export type GenerateOptions = {
   baseRef: string;
   headRef: string;
   model: LanguageModel;
+  maxSteps?: number;
+  onProgress?: ProgressCallback;
 };
 
 export type GenerateResult = {
