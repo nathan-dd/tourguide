@@ -38,6 +38,9 @@ importers:
       '@tourguide/format':
         specifier: workspace:*
         version: link:../format
+      '@tourguide/generate':
+        specifier: workspace:*
+        version: link:../generate
       chalk:
         specifier: ^5.4.1
         version: 5.6.2

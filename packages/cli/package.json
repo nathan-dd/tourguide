@@ -18,6 +18,7 @@
   "dependencies": {
     "@tourguide/format": "workspace:*",
     "@tourguide/core": "workspace:*",
+    "@tourguide/generate": "workspace:*",
     "chalk": "^5.4.1",
     "commander": "^13.1.0"
   }
