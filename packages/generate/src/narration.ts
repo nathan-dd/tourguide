@@ -5,6 +5,8 @@ import { Output, generateText } from 'ai';
 import { buildNarrationPrompt } from './prompts.js';
 import type { ProgressCallback, StepDetailCallback } from './types.js';
 
+const narrationSchema = diffTourSchema.omit({ $schema: true });
+
 export async function runNarration(options: {
   model: LanguageModel;
   synthesis: string;
@@ -41,7 +43,7 @@ export async function runNarration(options: {
     model,
     system,
     prompt,
-    output: Output.object({ schema: diffTourSchema }),
+    output: Output.object({ schema: narrationSchema }),
     onStepFinish: (event) => {
       onProgress?.('Narration step finished', { step: event.stepNumber });
       onStepDetail?.({

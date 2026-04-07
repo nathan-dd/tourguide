@@ -60,12 +60,14 @@ pnpm --filter @tourguide/cli exec tourguide play tour.tourguide
 
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| `@tourguide/format` | Zod schemas, TypeScript types, semantic validation, JSON Schema generation |
-| `@tourguide/core` | Tour loading, traversal, connection graph, source resolution |
-| `@tourguide/generate` | LLM-backed tour generation (discovery + narration pipeline) |
-| `@tourguide/cli` | CLI commands: `validate`, `summary`, `play`, `generate` |
+
+| Package               | Description                                                                |
+| --------------------- | -------------------------------------------------------------------------- |
+| `@tourguide/format`   | Zod schemas, TypeScript types, semantic validation, JSON Schema generation |
+| `@tourguide/core`     | Tour loading, traversal, connection graph, source resolution               |
+| `@tourguide/generate` | LLM-backed tour generation (discovery + narration pipeline)                |
+| `@tourguide/cli`      | CLI commands: `validate`, `summary`, `play`, `generate`                    |
+
 
 ## Development
 
@@ -74,3 +76,4 @@ pnpm check    # build + test + lint
 pnpm test     # tests only
 pnpm lint     # lint only
 ```
+
