@@ -64,10 +64,10 @@ const FIXTURES = {
 ## Task 1: buildGraph — merge per-step connections
 
 **Files:**
+
 - Modify: `packages/core/src/graph.ts`
 - Test: `packages/core/tests/graph.test.ts`
-
-- [ ] **Step 1: Write failing test for per-step-only connections**
+- **Step 1: Write failing test for per-step-only connections**
 
 Add this test to `packages/core/tests/graph.test.ts`:
 
@@ -145,12 +145,12 @@ describe('buildGraph — per-step connections', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- **Step 2: Run tests to verify they fail**
 
 Run: `pnpm test --filter @tourguide/core`
 Expected: FAIL — per-step connections not indexed, `outgoing('s-1')` returns empty array.
 
-- [ ] **Step 3: Implement per-step connection merging**
+- **Step 3: Implement per-step connection merging**
 
 Replace `buildGraph` in `packages/core/src/graph.ts`:
 
@@ -214,12 +214,12 @@ export function buildGraph(tour: Tour): TourGraph {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- **Step 4: Run tests to verify they pass**
 
 Run: `pnpm test --filter @tourguide/core`
 Expected: ALL PASS (both new and existing graph tests).
 
-- [ ] **Step 5: Commit**
+- **Step 5: Commit**
 
 ```bash
 git add packages/core/src/graph.ts packages/core/tests/graph.test.ts
@@ -235,10 +235,10 @@ Top-level connections take priority for descriptions."
 ## Task 2: Traversal — handle empty chapters and empty tours
 
 **Files:**
+
 - Modify: `packages/core/src/traversal.ts`
 - Test: `packages/core/tests/traversal.test.ts`
-
-- [ ] **Step 1: Write failing tests for empty tour and empty chapters**
+- **Step 1: Write failing tests for empty tour and empty chapters**
 
 Add these tests to `packages/core/tests/traversal.test.ts`:
 
@@ -356,12 +356,12 @@ describe('traversal — empty chapters', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- **Step 2: Run tests to verify they fail**
 
 Run: `pnpm test --filter @tourguide/core`
 Expected: FAIL — `firstPosition` returns `{0, 0}` instead of `null` or `{1, 0}`.
 
-- [ ] **Step 3: Implement traversal hardening**
+- **Step 3: Implement traversal hardening**
 
 Replace functions in `packages/core/src/traversal.ts`:
 
@@ -440,7 +440,7 @@ export function getProgress(tour: Tour, position: TourPosition | null): TourProg
 }
 ```
 
-- [ ] **Step 4: Update existing tests for new return types**
+- **Step 4: Update existing tests for new return types**
 
 In `packages/core/tests/traversal.test.ts`, the existing test `'returns first and last positions'` asserts `firstPosition(sampleTour)` returns a value. Add non-null assertions where needed since the sampleTour is not empty:
 
@@ -483,12 +483,12 @@ it('returns current chapter, step and progress', () => {
 });
 ```
 
-- [ ] **Step 5: Run tests to verify all pass**
+- **Step 5: Run tests to verify all pass**
 
 Run: `pnpm test --filter @tourguide/core`
 Expected: ALL PASS.
 
-- [ ] **Step 6: Commit**
+- **Step 6: Commit**
 
 ```bash
 git add packages/core/src/traversal.ts packages/core/tests/traversal.test.ts
@@ -504,12 +504,12 @@ accepts null position and returns 0/0 progress."
 ## Task 3: CLI package scaffold
 
 **Files:**
+
 - Create: `packages/cli/package.json`
 - Create: `packages/cli/tsconfig.json`
 - Create: `packages/cli/src/cli.ts`
 - Create: `packages/cli/src/output.ts`
-
-- [ ] **Step 1: Create package.json**
+- **Step 1: Create package.json**
 
 Create `packages/cli/package.json`:
 
@@ -540,7 +540,7 @@ Create `packages/cli/package.json`:
 }
 ```
 
-- [ ] **Step 2: Create tsconfig.json**
+- **Step 2: Create tsconfig.json**
 
 Create `packages/cli/tsconfig.json`:
 
@@ -565,7 +565,7 @@ Create `packages/cli/tsconfig.json`:
 }
 ```
 
-- [ ] **Step 3: Create output.ts**
+- **Step 3: Create output.ts**
 
 Create `packages/cli/src/output.ts`:
 
@@ -581,7 +581,7 @@ export const consoleOutput: Output = {
 };
 ```
 
-- [ ] **Step 4: Create cli.ts entry point skeleton**
+- **Step 4: Create cli.ts entry point skeleton**
 
 Create `packages/cli/src/cli.ts`:
 
@@ -630,13 +630,13 @@ program
 program.parse();
 ```
 
-- [ ] **Step 5: Install dependencies**
+- **Step 5: Install dependencies**
 
 ```bash
 cd packages/cli && pnpm install
 ```
 
-- [ ] **Step 6: Verify build works (will fail on missing command files — that's expected)**
+- **Step 6: Verify build works (will fail on missing command files — that's expected)**
 
 ```bash
 pnpm build --filter @tourguide/cli
@@ -644,7 +644,7 @@ pnpm build --filter @tourguide/cli
 
 Expected: Build failure because command files don't exist yet. That's fine — we just need the scaffold committed.
 
-- [ ] **Step 7: Commit scaffold**
+- **Step 7: Commit scaffold**
 
 ```bash
 git add packages/cli/
@@ -660,12 +660,12 @@ stubs, and the Output interface for testable commands."
 ## Task 4: Error formatting + validate command
 
 **Files:**
+
 - Create: `packages/cli/src/format/errors.ts`
 - Create: `packages/cli/tests/format/errors.test.ts`
 - Create: `packages/cli/src/commands/validate.ts`
 - Create: `packages/cli/tests/validate.test.ts`
-
-- [ ] **Step 1: Write failing tests for error formatting**
+- **Step 1: Write failing tests for error formatting**
 
 Create `packages/cli/tests/format/errors.test.ts`:
 
@@ -734,12 +734,12 @@ describe('formatFileResult', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- **Step 2: Run tests to verify they fail**
 
 Run: `pnpm test --filter @tourguide/cli`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement error formatting**
+- **Step 3: Implement error formatting**
 
 Create `packages/cli/src/format/errors.ts`:
 
@@ -777,12 +777,12 @@ export function formatFileResult(file: string, result: FileResult): string {
 }
 ```
 
-- [ ] **Step 4: Run format tests to verify they pass**
+- **Step 4: Run format tests to verify they pass**
 
 Run: `pnpm test --filter @tourguide/cli -- tests/format/errors.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Write failing tests for validate command**
+- **Step 5: Write failing tests for validate command**
 
 Create `packages/cli/tests/validate.test.ts`:
 
@@ -844,12 +844,12 @@ describe('validate command', () => {
 });
 ```
 
-- [ ] **Step 6: Run validate tests to verify they fail**
+- **Step 6: Run validate tests to verify they fail**
 
 Run: `pnpm test --filter @tourguide/cli -- tests/validate.test.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 7: Implement validate command**
+- **Step 7: Implement validate command**
 
 Create `packages/cli/src/commands/validate.ts`:
 
@@ -900,12 +900,12 @@ export async function validate(
 }
 ```
 
-- [ ] **Step 8: Run all CLI tests to verify they pass**
+- **Step 8: Run all CLI tests to verify they pass**
 
 Run: `pnpm test --filter @tourguide/cli`
 Expected: ALL PASS.
 
-- [ ] **Step 9: Commit**
+- **Step 9: Commit**
 
 ```bash
 git add packages/cli/src/format/errors.ts packages/cli/tests/format/errors.test.ts \
@@ -922,13 +922,13 @@ tour title and step counts, reports failures with categorized errors
 ## Task 5: Tour and code formatting + summary command
 
 **Files:**
+
 - Create: `packages/cli/src/format/tour.ts`
 - Create: `packages/cli/src/format/code.ts`
 - Create: `packages/cli/tests/format/tour.test.ts`
 - Create: `packages/cli/src/commands/summary.ts`
 - Create: `packages/cli/tests/summary.test.ts`
-
-- [ ] **Step 1: Write failing tests for tour formatting**
+- **Step 1: Write failing tests for tour formatting**
 
 Create `packages/cli/tests/format/tour.test.ts`:
 
@@ -1080,12 +1080,12 @@ describe('formatSummary', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- **Step 2: Run tests to verify they fail**
 
 Run: `pnpm test --filter @tourguide/cli -- tests/format/tour.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Implement code formatting**
+- **Step 3: Implement code formatting**
 
 Create `packages/cli/src/format/code.ts`:
 
@@ -1114,7 +1114,7 @@ export function formatCodeBlock(code: string, startLine: number): string {
 }
 ```
 
-- [ ] **Step 4: Implement tour formatting**
+- **Step 4: Implement tour formatting**
 
 Create `packages/cli/src/format/tour.ts`:
 
@@ -1223,12 +1223,12 @@ export function formatSummary(tour: Tour): string {
 }
 ```
 
-- [ ] **Step 5: Run format tests to verify they pass**
+- **Step 5: Run format tests to verify they pass**
 
 Run: `pnpm test --filter @tourguide/cli -- tests/format/tour.test.ts`
 Expected: ALL PASS.
 
-- [ ] **Step 6: Write failing tests for summary command**
+- **Step 6: Write failing tests for summary command**
 
 Create `packages/cli/tests/summary.test.ts`:
 
@@ -1283,7 +1283,7 @@ describe('summary command', () => {
 });
 ```
 
-- [ ] **Step 7: Implement summary command**
+- **Step 7: Implement summary command**
 
 Create `packages/cli/src/commands/summary.ts`:
 
@@ -1323,12 +1323,12 @@ export async function summary(
 }
 ```
 
-- [ ] **Step 8: Run all CLI tests to verify they pass**
+- **Step 8: Run all CLI tests to verify they pass**
 
 Run: `pnpm test --filter @tourguide/cli`
 Expected: ALL PASS.
 
-- [ ] **Step 9: Commit**
+- **Step 9: Commit**
 
 ```bash
 git add packages/cli/src/format/code.ts packages/cli/src/format/tour.ts \
@@ -1346,10 +1346,10 @@ command loads a tour and prints title, mode, chapters, and file map."
 ## Task 6: Play command
 
 **Files:**
+
 - Create: `packages/cli/src/commands/play.ts`
 - Create: `packages/cli/tests/play.test.ts`
-
-- [ ] **Step 1: Write failing tests for play rendering**
+- **Step 1: Write failing tests for play rendering**
 
 Create `packages/cli/tests/play.test.ts`:
 
@@ -1448,12 +1448,12 @@ describe('play rendering', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- **Step 2: Run tests to verify they fail**
 
 Run: `pnpm test --filter @tourguide/cli -- tests/play.test.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement play command**
+- **Step 3: Implement play command**
 
 Create `packages/cli/src/commands/play.ts`:
 
@@ -1628,12 +1628,12 @@ export async function play(
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- **Step 4: Run tests to verify they pass**
 
 Run: `pnpm test --filter @tourguide/cli`
 Expected: ALL PASS.
 
-- [ ] **Step 5: Commit**
+- **Step 5: Commit**
 
 ```bash
 git add packages/cli/src/commands/play.ts packages/cli/tests/play.test.ts
@@ -1650,9 +1650,9 @@ source files."
 ## Task 7: Integration wiring and full test run
 
 **Files:**
-- Modify: `packages/cli/src/cli.ts` (already has stubs — verify they work)
 
-- [ ] **Step 1: Build all packages**
+- Modify: `packages/cli/src/cli.ts` (already has stubs — verify they work)
+- **Step 1: Build all packages**
 
 ```bash
 pnpm build
@@ -1660,7 +1660,7 @@ pnpm build
 
 Expected: All three packages build successfully.
 
-- [ ] **Step 2: Run full test suite**
+- **Step 2: Run full test suite**
 
 ```bash
 pnpm test
@@ -1668,7 +1668,7 @@ pnpm test
 
 Expected: ALL PASS across all packages.
 
-- [ ] **Step 3: Run lint**
+- **Step 3: Run lint**
 
 ```bash
 pnpm lint
@@ -1676,7 +1676,7 @@ pnpm lint
 
 Expected: No lint errors. Fix any that appear.
 
-- [ ] **Step 4: Smoke test the CLI binary**
+- **Step 4: Smoke test the CLI binary**
 
 ```bash
 cd packages/cli
@@ -1688,17 +1688,17 @@ node dist/cli.js summary ../../examples/sample.tourguide
 ```
 
 Expected:
+
 - `--version` prints `0.1.0`
 - `--help` shows program description and subcommands
 - `validate` on sample shows green checkmark
 - `validate` on invalid shows red errors
 - `summary` on sample shows tour summary with chapters and file map
-
-- [ ] **Step 5: Fix any issues found during smoke testing**
+- **Step 5: Fix any issues found during smoke testing**
 
 If any commands don't work as expected, fix the issues and re-run tests.
 
-- [ ] **Step 6: Final commit**
+- **Step 6: Final commit**
 
 ```bash
 git add -A
@@ -1708,3 +1708,4 @@ All commands working: validate, play, summary. Foundation fixes
 applied: buildGraph merges per-step connections, traversal handles
 empty chapters/tours. Full test coverage across core fixes and CLI."
 ```
+

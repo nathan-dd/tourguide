@@ -115,7 +115,7 @@ Here's a minimal tour showing the key concepts:
 }
 ```
 
-The full JSON Schema is published as part of [`@tourguide/format`](packages/format/tourguide.schema.json).
+The full JSON Schema is published as part of `[@tourguide/format](packages/format/tourguide.schema.json)`.
 
 ---
 
@@ -161,12 +161,14 @@ Zero-install: `npx tourguide generate --diff main..HEAD`
 
 ### Cross-Tool Compatibility
 
-| Tool | Reads format | Generates tours | Visualizes tours |
-|------|-------------|----------------|-----------------|
-| **Cursor / VS Code** | Yes | Via CLI | Full extension experience |
-| **Claude Code** | Yes | Primary use case | Terminal via `tourguide play`; conversational narration from JSON |
-| **Codex / CI** | Yes | Async generation | Validation via `tourguide validate` |
-| **Any LLM agent** | Yes (JSON Schema) | Yes (schema-guided) | — |
+
+| Tool                 | Reads format      | Generates tours     | Visualizes tours                                                  |
+| -------------------- | ----------------- | ------------------- | ----------------------------------------------------------------- |
+| **Cursor / VS Code** | Yes               | Via CLI             | Full extension experience                                         |
+| **Claude Code**      | Yes               | Primary use case    | Terminal via `tourguide play`; conversational narration from JSON |
+| **Codex / CI**       | Yes               | Async generation    | Validation via `tourguide validate`                               |
+| **Any LLM agent**    | Yes (JSON Schema) | Yes (schema-guided) | —                                                                 |
+
 
 ---
 
