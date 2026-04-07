@@ -6,6 +6,8 @@ export type {
   ProgressCallback,
 } from './types.js';
 
+export { runDiscovery } from './discovery.js';
+export { runNarration } from './narration.js';
 export { buildDiscoveryPrompt, buildNarrationPrompt } from './prompts.js';
 export { createModel } from './provider.js';
 
