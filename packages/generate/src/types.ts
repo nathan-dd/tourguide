@@ -6,6 +6,16 @@ export type ProgressCallback = (
   detail?: { step?: number; maxSteps?: number },
 ) => void;
 
+export type StepDetail = {
+  phase: 'discovery' | 'narration';
+  stepNumber: number;
+  text: string;
+  toolCalls: Array<{ toolName: string; args: Record<string, unknown> }>;
+  toolResults: Array<{ toolName: string; result: string }>;
+};
+
+export type StepDetailCallback = (detail: StepDetail) => void;
+
 export type GenerateOptions = {
   repoPath: string;
   baseRef: string;
@@ -13,6 +23,7 @@ export type GenerateOptions = {
   model: LanguageModel;
   maxSteps?: number;
   onProgress?: ProgressCallback;
+  onStepDetail?: StepDetailCallback;
 };
 
 /** Options for {@link generateTour}; includes identity metadata for `tour.generatedBy`. */

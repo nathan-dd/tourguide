@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { promisify } from 'node:util';
 import type { ValidationError, ValidationWarning } from '@tourguide/format';
+import type { StepDetail } from '@tourguide/generate';
 import { createModel, generateTour } from '@tourguide/generate';
 
 const execFileAsync = promisify(execFile);
@@ -12,6 +13,7 @@ export type GenerateCommandOptions = {
   provider: string;
   maxSteps: number;
   quiet: boolean;
+  verbose: boolean;
   /** From `packages/cli/package.json` (see cli.ts createRequire). */
   packageVersion: string;
   output?: string;
@@ -47,6 +49,26 @@ function formatIssues(label: string, items: ValidationWarning[] | ValidationErro
   return items.map((w) => `${label}: ${w.path}: ${w.message} (${w.code})`).join('\n');
 }
 
+function truncate(s: string, max: number): string {
+  return s.length <= max ? s : `${s.slice(0, max)}…`;
+}
+
+function formatStepDetail(detail: StepDetail): string {
+  const lines: string[] = [];
+  const header = `[${detail.phase} step ${detail.stepNumber}]`;
+
+  for (const tc of detail.toolCalls) {
+    lines.push(`${header} tool_call: ${tc.toolName}(${truncate(JSON.stringify(tc.args), 200)})`);
+  }
+  for (const tr of detail.toolResults) {
+    lines.push(`${header} tool_result: ${tr.toolName} → ${truncate(tr.result, 300)}`);
+  }
+  if (detail.text) {
+    lines.push(`${header} text: ${truncate(detail.text, 500)}`);
+  }
+  return lines.join('\n');
+}
+
 /**
  * Runs tour generation; prints JSON to stdout or `--output`. Returns exit code (1 on semantic errors or failure).
  */
@@ -77,6 +99,14 @@ export async function generate(
         };
 
   try {
+    const onStepDetail =
+      opts.verbose === true
+        ? (detail: StepDetail) => {
+            const formatted = formatStepDetail(detail);
+            if (formatted) console.error(formatted);
+          }
+        : undefined;
+
     const model = await createModel(opts.provider, opts.model);
     const result = await generateTour({
       repoPath,
@@ -85,6 +115,7 @@ export async function generate(
       model,
       maxSteps: opts.maxSteps,
       onProgress,
+      onStepDetail,
       modelId: opts.model,
       packageVersion: opts.packageVersion,
     });

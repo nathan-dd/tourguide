@@ -3,6 +3,8 @@ export type {
   GenerateResult,
   GenerateTourOptions,
   ProgressCallback,
+  StepDetail,
+  StepDetailCallback,
 } from './types.js';
 
 export { generateTour } from './generate.js';

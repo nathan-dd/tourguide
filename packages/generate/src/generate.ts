@@ -4,8 +4,17 @@ import type { GenerateResult, GenerateTourOptions } from './types.js';
 import { runNarrationWithRetry } from './validation.js';
 
 export async function generateTour(options: GenerateTourOptions): Promise<GenerateResult> {
-  const { repoPath, baseRef, headRef, model, maxSteps, onProgress, modelId, packageVersion } =
-    options;
+  const {
+    repoPath,
+    baseRef,
+    headRef,
+    model,
+    maxSteps,
+    onProgress,
+    onStepDetail,
+    modelId,
+    packageVersion,
+  } = options;
 
   const diff = (await execGit(['diff', `${baseRef}..${headRef}`], repoPath)).trimEnd();
   const synthesis = await runDiscovery({
@@ -14,6 +23,7 @@ export async function generateTour(options: GenerateTourOptions): Promise<Genera
     repoPath,
     maxSteps: maxSteps ?? 25,
     onProgress,
+    onStepDetail,
   });
 
   const { tour, warnings, semanticErrors } = await runNarrationWithRetry({
@@ -25,6 +35,7 @@ export async function generateTour(options: GenerateTourOptions): Promise<Genera
     modelId,
     packageVersion,
     onProgress,
+    onStepDetail,
   });
 
   return semanticErrors === undefined ? { tour, warnings } : { tour, warnings, semanticErrors };

@@ -2,7 +2,7 @@ import type { LanguageModel } from 'ai';
 import { generateText, stepCountIs } from 'ai';
 import { buildDiscoveryPrompt } from './prompts.js';
 import { createTools } from './tools/index.js';
-import type { ProgressCallback } from './types.js';
+import type { ProgressCallback, StepDetailCallback } from './types.js';
 
 type ResponseMessageLike = { role: string; content?: unknown };
 
@@ -58,8 +58,9 @@ export async function runDiscovery(options: {
   repoPath: string;
   maxSteps: number;
   onProgress?: ProgressCallback;
+  onStepDetail?: StepDetailCallback;
 }): Promise<string> {
-  const { model, diff, repoPath, maxSteps, onProgress } = options;
+  const { model, diff, repoPath, maxSteps, onProgress, onStepDetail } = options;
   const { system, prompt } = buildDiscoveryPrompt(diff);
   const tools = createTools(repoPath);
 
@@ -73,6 +74,19 @@ export async function runDiscovery(options: {
       onProgress?.('Discovery step finished', {
         step: event.stepNumber,
         maxSteps,
+      });
+      onStepDetail?.({
+        phase: 'discovery',
+        stepNumber: event.stepNumber,
+        text: event.text,
+        toolCalls: event.toolCalls.map((tc) => ({
+          toolName: tc.toolName,
+          args: tc.input as Record<string, unknown>,
+        })),
+        toolResults: event.toolResults.map((tr) => ({
+          toolName: tr.toolName,
+          result: typeof tr.output === 'string' ? tr.output : JSON.stringify(tr.output),
+        })),
       });
     },
   });

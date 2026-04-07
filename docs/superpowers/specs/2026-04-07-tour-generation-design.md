@@ -23,6 +23,7 @@ Tours must be **usable as-is** — no editing expected. If the tool produces con
 New package: `packages/generate/` (`@tourguide/generate`)
 
 **Dependencies:**
+
 - `ai` (Vercel AI SDK)
 - `@ai-sdk/anthropic` (default provider)
 - `@tourguide/format` (schema, validation, JSON Schema)
@@ -60,6 +61,7 @@ Instead, the LLM gets the raw diff and tools to explore the codebase autonomousl
 The generation code never calls provider APIs directly. It uses the Vercel AI SDK (`ai` package), which provides a unified interface across Anthropic, OpenAI, Google, Mistral, and others.
 
 **Why the AI SDK over direct SDKs or a custom abstraction:**
+
 - Tool use normalization across providers is genuinely hard. Anthropic's native tool use, OpenAI's function calling, and Google's function declarations all become the same interface. This is critical for the agentic loop.
 - `generateText` with tools + `stopWhen: stepCountIs(N)` handles the discovery agent loop. `generateText` with `output: Output.object({ schema })` handles the narration call with schema enforcement.
 - Provider packages are separate (`@ai-sdk/anthropic`, `@ai-sdk/openai`). Users only install what they use. Adding a provider is a dependency, not a code change.
@@ -76,13 +78,15 @@ The discovery prompt has no knowledge of the tourguide format. It's pure compreh
 
 **Tools:**
 
-| Tool | Implementation | Purpose |
-|------|---------------|---------|
-| `readFileAtRef` | `git show ref:path` | Read file content at a specific git ref |
-| `searchCodebase` | ripgrep over working tree | Find symbols, usages, definitions |
-| `listDirectory` | `ls` / `git ls-tree` at a ref | Orient in project structure, discover related files |
-| `gitLog` | `git log --oneline` for a path | Understand history and context |
-| `gitBlame` | `git blame` for a file range | Attribution and change context |
+
+| Tool             | Implementation                 | Purpose                                             |
+| ---------------- | ------------------------------ | --------------------------------------------------- |
+| `readFileAtRef`  | `git show ref:path`            | Read file content at a specific git ref             |
+| `searchCodebase` | ripgrep over working tree      | Find symbols, usages, definitions                   |
+| `listDirectory`  | `ls` / `git ls-tree` at a ref  | Orient in project structure, discover related files |
+| `gitLog`         | `git log --oneline` for a path | Understand history and context                      |
+| `gitBlame`       | `git blame` for a file range   | Attribution and change context                      |
+
 
 All tools are read-only and execute against the local git repo.
 
@@ -93,6 +97,7 @@ All tools are read-only and execute against the local git repo.
 ### Call 2: Narration (generateText + Output.object + tourSchema)
 
 The narration model receives:
+
 1. A system prompt explaining its role as a tour author
 2. The discovery synthesis
 3. The raw diff (for precise file/line anchoring)
@@ -115,16 +120,19 @@ Note: while the AI SDK supports combining tools + structured output in a single 
 tourguide generate --diff base..head [options]
 ```
 
-| Flag | Default | Purpose |
-|------|---------|---------|
-| `--diff <range>` | (required) | Git ref range: `main..HEAD`, `abc123..def456` |
-| `--model <model>` | `claude-sonnet-4-20250514` | Model identifier (AI SDK format) |
-| `--provider <name>` | `anthropic` | AI SDK provider name |
-| `--output <path>` | stdout | Write tour to file instead of stdout |
-| `--max-steps <n>` | `25` | Cap on discovery tool-use rounds |
-| `--quiet` | off | Suppress stderr progress |
 
-**API keys** follow each provider's convention via environment variables (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, etc.). The AI SDK handles this per provider.
+| Flag                | Default                    | Purpose                                       |
+| ------------------- | -------------------------- | --------------------------------------------- |
+| `--diff <range>`    | (required)                 | Git ref range: `main..HEAD`, `abc123..def456` |
+| `--model <model>`   | `claude-sonnet-4-20250514` | Model identifier (AI SDK format)              |
+| `--provider <name>` | `anthropic`                | AI SDK provider name                          |
+| `--output <path>`   | stdout                     | Write tour to file instead of stdout          |
+| `--max-steps <n>`   | `25`                       | Cap on discovery tool-use rounds              |
+| `--quiet`           | off                        | Suppress stderr progress                      |
+| `--verbose`         | off                        | Show LLM text and tool calls on stderr        |
+
+
+**API keys** follow each provider's convention via environment variables (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, etc.). The AI SDK handles this per provider. The CLI loads `.env` files from the current directory via `dotenv`, so you can store keys in a gitignored `.env` file rather than exporting them in your shell.
 
 **Other providers:** `@ai-sdk/anthropic` ships as a dependency. Other providers require the user to install the corresponding SDK package (e.g., `pnpm add @ai-sdk/openai`). If `--provider` is set but the package isn't installed, fail with a clear message explaining which package to install.
 
@@ -142,13 +150,15 @@ tourguide generate --diff base..head [options]
 
 **Error behavior:**
 
-| Error | Behavior |
-|-------|----------|
-| Git failure (bad refs, not a repo) | Fail fast, clear message, exit 1 |
-| API key missing | Fail fast: "ANTHROPIC_API_KEY not set", exit 1 |
-| API error (rate limit, network) | Fail with provider error message, exit 1 |
-| Semantic validation failure | Retry narration once with error context |
-| Retry also fails | Output invalid tour to stdout + warnings to stderr, exit 1 |
+
+| Error                              | Behavior                                                   |
+| ---------------------------------- | ---------------------------------------------------------- |
+| Git failure (bad refs, not a repo) | Fail fast, clear message, exit 1                           |
+| API key missing                    | Fail fast: "ANTHROPIC_API_KEY not set", exit 1             |
+| API error (rate limit, network)    | Fail with provider error message, exit 1                   |
+| Semantic validation failure        | Retry narration once with error context                    |
+| Retry also fails                   | Output invalid tour to stdout + warnings to stderr, exit 1 |
+
 
 **Best-effort escape hatch:** When retry fails, we have a tour that's structurally valid (matched the Zod schema) but has semantic issues. Rather than discarding 60 seconds of work, output it with stderr warnings listing the errors. The user can manually fix the issues or discard it.
 
@@ -157,12 +167,14 @@ tourguide generate --diff base..head [options]
 **Principle:** Test everything except the LLM call deterministically. Test LLM integration with a small number of focused e2e tests.
 
 **Unit tests (no LLM):**
+
 - **Tool implementations** — `readFileAtRef`, `searchCodebase`, `listDirectory`, `gitLog`, `gitBlame` tested against a fixture git repo (small repo created in test setup with known commits)
 - **Prompt construction** — Given a diff and options, assert the prompts include the right content
 - **Validation/retry logic** — Given a tour with semantic errors, assert retry appends errors correctly; assert best-effort path outputs with warnings
 - **CLI flag parsing** — Assert flag combinations produce the right config
 
 **Integration tests (real LLM, gated):**
+
 - Gated behind `TOURGUIDE_TEST_LLM=1`. Skipped by default — run manually or in a dedicated CI job with API keys.
 - 2–3 tests against the fixture repo: generate a tour from a known diff, assert the output passes `validate()`, assert it has chapters and steps referencing files in the diff.
 - Assert **structural correctness**, not narrative quality. The pipeline should produce a valid tour anchored to the right files — not necessarily a beautifully written one.
@@ -176,6 +188,7 @@ The full generation vision is sliced into milestones. Project-level M2 = G1.
 ### G1: Single-model agentic generation (= M2)
 
 The full pipeline ships end-to-end:
+
 - `tourguide generate --diff base..head` with discovery → narration → validation
 - All five tools, single model for everything
 - Vercel AI SDK, Anthropic default, any provider usable via `--provider`/`--model`
@@ -187,6 +200,7 @@ The full pipeline ships end-to-end:
 ### G2: Model tiering
 
 The discovery phase becomes a two-tier system:
+
 - A **frontier model** (Opus-class) orchestrates discovery — it sees the diff, formulates targeted questions, and synthesizes findings
 - **Workhorse subagents** (Sonnet/Haiku-class) execute the questions — they receive a focused question + file/search scope, read the code, and return targeted summaries
 - The frontier model never reads 2000-line files directly; it gets 200-token summaries of exactly what it asked about
@@ -214,3 +228,4 @@ Interactive session where the agent asks clarifying questions mid-discovery. Req
 - **M2** = G1
 - **M4** (Deepen Generation) = G2 + G4 + G5 + pattern anchoring
 - G3 and G6 extend beyond the current roadmap
+

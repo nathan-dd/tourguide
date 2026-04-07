@@ -1,9 +1,9 @@
 import type { Tour } from '@tourguide/format';
-import { tourSchema } from '@tourguide/format';
+import { diffTourSchema } from '@tourguide/format';
 import type { LanguageModel } from 'ai';
 import { Output, generateText } from 'ai';
 import { buildNarrationPrompt } from './prompts.js';
-import type { ProgressCallback } from './types.js';
+import type { ProgressCallback, StepDetailCallback } from './types.js';
 
 export async function runNarration(options: {
   model: LanguageModel;
@@ -14,6 +14,7 @@ export async function runNarration(options: {
   modelId: string;
   packageVersion: string;
   onProgress?: ProgressCallback;
+  onStepDetail?: StepDetailCallback;
   promptAppend?: string;
 }): Promise<Tour> {
   const {
@@ -25,6 +26,7 @@ export async function runNarration(options: {
     modelId,
     packageVersion,
     onProgress,
+    onStepDetail,
     promptAppend,
   } = options;
   const { system, prompt } = buildNarrationPrompt({
@@ -39,9 +41,16 @@ export async function runNarration(options: {
     model,
     system,
     prompt,
-    output: Output.object({ schema: tourSchema }),
+    output: Output.object({ schema: diffTourSchema }),
     onStepFinish: (event) => {
       onProgress?.('Narration step finished', { step: event.stepNumber });
+      onStepDetail?.({
+        phase: 'narration',
+        stepNumber: event.stepNumber,
+        text: event.text,
+        toolCalls: [],
+        toolResults: [],
+      });
     },
   });
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import 'dotenv/config';
 import { createRequire } from 'node:module';
 import { Command } from 'commander';
 import { generate } from './commands/generate.js';
@@ -49,6 +50,7 @@ program
   .option('--output <path>', 'Write tour to file')
   .option('--max-steps <n>', 'Max discovery steps', '25')
   .option('--quiet', 'Suppress progress output')
+  .option('--verbose', 'Show LLM text and tool calls on stderr')
   .action(
     async (opts: {
       diff: string;
@@ -57,6 +59,7 @@ program
       output?: string;
       maxSteps: string;
       quiet?: boolean;
+      verbose?: boolean;
     }) => {
       const maxSteps = Number.parseInt(opts.maxSteps, 10);
       if (Number.isNaN(maxSteps) || maxSteps < 1) {
@@ -69,6 +72,7 @@ program
         provider: opts.provider,
         maxSteps,
         quiet: opts.quiet === true,
+        verbose: opts.verbose === true,
         output: opts.output,
         packageVersion: version,
       });
