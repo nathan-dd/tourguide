@@ -45,7 +45,7 @@ program
   .command('generate')
   .description('Generate a tour from a git diff')
   .requiredOption('--diff <range>', 'Git ref range (e.g., main..HEAD)')
-  .option('--model <model>', 'Model identifier', 'claude-sonnet-4-20250514')
+  .option('--model <model>', 'Model identifier', 'claude-sonnet-4-6')
   .option('--provider <name>', 'AI SDK provider', 'anthropic')
   .option('--output <path>', 'Write tour to file')
   .option('--max-steps <n>', 'Max discovery steps', '25')

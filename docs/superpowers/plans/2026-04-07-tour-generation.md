@@ -468,7 +468,7 @@ In `packages/cli/package.json`, add `"@tourguide/generate": "workspace:*"` to de
 Add the `generate` command to the commander program with options:
 
 - `.requiredOption('--diff <range>', 'Git ref range (e.g., main..HEAD)')`
-- `.option('--model <model>', 'Model identifier', 'claude-sonnet-4-20250514')`
+- `.option('--model <model>', 'Model identifier', 'claude-sonnet-4-6')`
 - `.option('--provider <name>', 'AI SDK provider', 'anthropic')`
 - `.option('--output <path>', 'Write tour to file')`
 - `.option('--max-steps <n>', 'Max discovery steps', '25')`
@@ -510,7 +510,7 @@ Gated behind `TOURGUIDE_TEST_LLM=1` (skip the entire describe block otherwise).
 Test flow:
 
 1. Create fixture repo using `createFixtureRepo()`
-2. Call `generateTour` with real Anthropic model (`claude-sonnet-4-20250514`), the fixture's baseRef/headRef
+2. Call `generateTour` with real Anthropic model (`claude-sonnet-4-6`), the fixture's baseRef/headRef
 3. Assert the result has a valid tour (result.tour is defined)
 4. Assert the tour passes `validate()` from `@tourguide/format`
 5. Assert `tour.mode === 'diff'`

@@ -113,7 +113,7 @@ describe('generate command (mocked @tourguide/generate)', () => {
       const code = await generate(
         {
           diff: 'main..HEAD',
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           provider: 'anthropic',
           maxSteps: 25,
           quiet: false,

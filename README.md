@@ -15,6 +15,25 @@ pnpm install
 pnpm build
 ```
 
+Then make the `tourguide` command available globally:
+
+```bash
+# One-time setup: configure pnpm's global bin directory and add it to PATH
+pnpm setup
+source ~/.zshrc   # or ~/.bashrc / ~/.bash_profile
+
+# Link the CLI into the global bin
+cd packages/cli && pnpm link --global
+```
+
+Verify:
+
+```bash
+tourguide --version
+```
+
+After this, `tourguide` is a live symlink to `packages/cli/dist/cli.js`. Running `pnpm build` from the repo root is enough to pick up code changes — no re-linking needed.
+
 ## Configuration
 
 The CLI reads API keys from environment variables. The easiest way to set them is a `.env` file in the project root:
@@ -31,31 +50,31 @@ Other providers (`openai`, `google`, etc.) use their own env vars (`OPENAI_API_K
 
 ```bash
 # Basic usage — outputs tour JSON to stdout
-pnpm --filter @tourguide/cli exec tourguide generate --diff main..HEAD
+tourguide generate --diff main..HEAD
 
 # Write to a file with verbose logging
-pnpm --filter @tourguide/cli exec tourguide generate --diff main..HEAD --output tour.tourguide --verbose
+tourguide generate --diff main..HEAD --output tour.tourguide --verbose
 
 # Use a different model
-pnpm --filter @tourguide/cli exec tourguide generate --diff main..HEAD --model claude-sonnet-4-20250514 --provider anthropic
+tourguide generate --diff main..HEAD --model claude-sonnet-4-6 --provider anthropic
 ```
 
 ### Validate a tour file
 
 ```bash
-pnpm --filter @tourguide/cli exec tourguide validate tour.tourguide
+tourguide validate tour.tourguide
 ```
 
 ### Print a tour summary
 
 ```bash
-pnpm --filter @tourguide/cli exec tourguide summary tour.tourguide
+tourguide summary tour.tourguide
 ```
 
 ### Play through a tour interactively
 
 ```bash
-pnpm --filter @tourguide/cli exec tourguide play tour.tourguide
+tourguide play tour.tourguide
 ```
 
 ## Packages

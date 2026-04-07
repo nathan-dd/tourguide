@@ -124,7 +124,7 @@ tourguide generate --diff base..head [options]
 | Flag                | Default                    | Purpose                                       |
 | ------------------- | -------------------------- | --------------------------------------------- |
 | `--diff <range>`    | (required)                 | Git ref range: `main..HEAD`, `abc123..def456` |
-| `--model <model>`   | `claude-sonnet-4-20250514` | Model identifier (AI SDK format)              |
+| `--model <model>`   | `claude-sonnet-4-6`        | Model identifier (AI SDK format)              |
 | `--provider <name>` | `anthropic`                | AI SDK provider name                          |
 | `--output <path>`   | stdout                     | Write tour to file instead of stdout          |
 | `--max-steps <n>`   | `25`                       | Cap on discovery tool-use rounds              |

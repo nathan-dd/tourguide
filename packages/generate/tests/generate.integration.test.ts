@@ -32,7 +32,7 @@ describe.runIf(process.env.TOURGUIDE_TEST_LLM === '1')('generateTour (LLM integr
     repoPath = fixture.repoPath;
     const { baseRef, headRef } = fixture;
 
-    const modelId = process.env.TOURGUIDE_TEST_MODEL ?? 'claude-sonnet-4-20250514';
+    const modelId = process.env.TOURGUIDE_TEST_MODEL ?? 'claude-sonnet-4-6';
     const model = await createModel('anthropic', modelId);
 
     const result = await generateTour({
