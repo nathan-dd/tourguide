@@ -10,12 +10,6 @@
   "references": [
     {
       "path": "../format"
-    },
-    {
-      "path": "../core"
-    },
-    {
-      "path": "../generate"
     }
   ]
 }

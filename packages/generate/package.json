@@ -1,0 +1,31 @@
+{
+  "name": "@tourguide/generate",
+  "version": "0.1.0",
+  "description": "Tourguide LLM-backed tour generation",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "biome check src tests"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.0",
+    "@tourguide/format": "workspace:*",
+    "ai": "^6.0.0",
+    "zod": "^3.24.1"
+  }
+}
