@@ -30,4 +30,15 @@ describe('buildNarrationPrompt', () => {
     expect(prompt).toContain(headRef);
     expect(prompt.toLowerCase()).toContain('diff');
   });
+
+  it('appends promptAppend when provided', () => {
+    const { prompt } = buildNarrationPrompt({
+      synthesis: 's',
+      diff: 'd',
+      baseRef: 'a',
+      headRef: 'b',
+      promptAppend: 'Retry hint',
+    });
+    expect(prompt.endsWith('Retry hint')).toBe(true);
+  });
 });

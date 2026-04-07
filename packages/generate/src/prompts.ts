@@ -24,8 +24,10 @@ export function buildNarrationPrompt(options: {
   diff: string;
   baseRef: string;
   headRef: string;
+  /** Appended to the user prompt (e.g. validation retry instructions). */
+  promptAppend?: string;
 }): { system: string; prompt: string } {
-  const { synthesis, diff, baseRef, headRef } = options;
+  const { synthesis, diff, baseRef, headRef, promptAppend } = options;
 
   const system = [
     'You are writing a guided tour of a pull request for a code reviewer who needs to understand the change quickly.',
@@ -48,6 +50,7 @@ export function buildNarrationPrompt(options: {
     'Raw unified diff (use paths and line numbers here when anchoring steps):',
     '',
     diff,
+    ...(promptAppend !== undefined && promptAppend.length > 0 ? ['', promptAppend] : []),
   ].join('\n');
 
   return { system, prompt };

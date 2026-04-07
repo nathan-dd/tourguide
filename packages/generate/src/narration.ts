@@ -14,9 +14,26 @@ export async function runNarration(options: {
   modelId: string;
   packageVersion: string;
   onProgress?: ProgressCallback;
+  promptAppend?: string;
 }): Promise<Tour> {
-  const { model, synthesis, diff, baseRef, headRef, modelId, packageVersion, onProgress } = options;
-  const { system, prompt } = buildNarrationPrompt({ synthesis, diff, baseRef, headRef });
+  const {
+    model,
+    synthesis,
+    diff,
+    baseRef,
+    headRef,
+    modelId,
+    packageVersion,
+    onProgress,
+    promptAppend,
+  } = options;
+  const { system, prompt } = buildNarrationPrompt({
+    synthesis,
+    diff,
+    baseRef,
+    headRef,
+    promptAppend,
+  });
 
   const result = await generateText({
     model,

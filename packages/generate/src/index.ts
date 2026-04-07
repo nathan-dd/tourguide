@@ -1,16 +1,13 @@
-import type { GenerateOptions, GenerateResult } from './types.js';
-
 export type {
   GenerateOptions,
   GenerateResult,
+  GenerateTourOptions,
   ProgressCallback,
 } from './types.js';
 
+export { generateTour } from './generate.js';
 export { runDiscovery } from './discovery.js';
 export { runNarration } from './narration.js';
 export { buildDiscoveryPrompt, buildNarrationPrompt } from './prompts.js';
 export { createModel } from './provider.js';
-
-export async function generateTour(_options: GenerateOptions): Promise<GenerateResult> {
-  throw new Error('not implemented');
-}
+export { runNarrationWithRetry, validateTour } from './validation.js';
