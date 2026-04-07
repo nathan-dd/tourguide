@@ -20,11 +20,36 @@ export function resolveNode(tour: Tour, id: string): TourNode | undefined {
   return tour.annotations.find((annotation) => annotation.id === id);
 }
 
+function connectionKey(connection: Connection): string {
+  return `${connection.from}|${connection.to}|${connection.type}`;
+}
+
+function collectConnections(tour: Tour): Connection[] {
+  const byKey = new Map<string, Connection>();
+
+  for (const connection of tour.connections) {
+    byKey.set(connectionKey(connection), connection);
+  }
+
+  for (const chapter of tour.chapters) {
+    for (const step of chapter.steps) {
+      for (const connection of step.connections) {
+        const key = connectionKey(connection);
+        if (!byKey.has(key)) {
+          byKey.set(key, connection);
+        }
+      }
+    }
+  }
+
+  return Array.from(byKey.values());
+}
+
 export function buildGraph(tour: Tour): TourGraph {
   const outgoingByNode = new Map<string, Connection[]>();
   const incomingByNode = new Map<string, Connection[]>();
 
-  for (const connection of tour.connections) {
+  for (const connection of collectConnections(tour)) {
     const outgoing = outgoingByNode.get(connection.from) ?? [];
     outgoing.push(connection);
     outgoingByNode.set(connection.from, outgoing);

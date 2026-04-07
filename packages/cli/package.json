@@ -1,0 +1,24 @@
+{
+  "name": "@tourguide/cli",
+  "version": "0.1.0",
+  "description": "Tourguide CLI — validate, play, and summarize code tours",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "tourguide": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/cli.ts --format esm --dts",
+    "test": "vitest run --passWithNoTests",
+    "lint": "biome check src tests"
+  },
+  "dependencies": {
+    "@tourguide/format": "workspace:*",
+    "@tourguide/core": "workspace:*",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0"
+  }
+}

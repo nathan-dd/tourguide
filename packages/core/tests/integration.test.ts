@@ -10,6 +10,10 @@ describe('integration', () => {
   it('loads example tour and traverses all steps', async () => {
     const tour = await loadTour(resolve(process.cwd(), '../../examples/sample.tourguide'));
     const start = firstPosition(tour);
+    expect(start).not.toBeNull();
+    if (!start) {
+      return;
+    }
     const first = getStep(tour, start);
     const secondPosition = nextStep(tour, start);
 
