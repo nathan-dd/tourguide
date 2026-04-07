@@ -9,8 +9,8 @@
 ```mermaid
 graph TD
     M0["M0: Foundation ✅"]
-    M1["M1: CLI Scaffold 🔵"]
-    M2["M2: Tour Generation"]
+    M1["M1: CLI Scaffold ✅"]
+    M2["M2: Tour Generation 🔵"]
     M3["M3: VS Code Extension MVP"]
     M4["M4: Deepen Generation"]
     M5["M5: Deepen VS Code"]
@@ -26,8 +26,8 @@ graph TD
     M5 --> M6
 
     style M0 fill:#0d3320,stroke:#2dd4bf,color:#a7f3d0
-    style M1 fill:#1e2a4a,stroke:#60a5fa,color:#bfdbfe
-    style M2 fill:#1f1f2e,stroke:#555,color:#aaa
+    style M1 fill:#0d3320,stroke:#2dd4bf,color:#a7f3d0
+    style M2 fill:#1e2a4a,stroke:#60a5fa,color:#bfdbfe
     style M3 fill:#1f1f2e,stroke:#555,color:#aaa
     style M4 fill:#1f1f2e,stroke:#555,color:#aaa
     style M5 fill:#1f1f2e,stroke:#555,color:#aaa
@@ -37,10 +37,10 @@ graph TD
 | Milestone | Status | Goal |
 |-----------|--------|------|
 | **M0: Foundation** | ✅ Done | Format schema, validation, core traversal/graph/resolver |
-| **M1: CLI Scaffold** | 🔵 Next | Stand up CLI with validate/play/summary, harden the foundation |
-| **M2: Tour Generation** | Upcoming | `generate --diff` produces valid tours from real PRs |
+| **M1: CLI Scaffold** | ✅ Done | CLI with validate/play/summary, hardened foundation |
+| **M2: Tour Generation** | 🔵 Active | Agentic generation — `generate --diff` produces valid tours from real PRs |
 | **M3: VS Code Extension MVP** | Upcoming | Rich interactive visualization — overview, guided play, decorations |
-| **M4: Deepen Generation** | Upcoming | Codebase mode, pattern anchoring, multi-model cost optimization |
+| **M4: Deepen Generation** | Upcoming | Model tiering, codebase mode, feedback loop, large diff handling |
 | **M5: Deepen VS Code** | Upcoming | Connections nav, file explorer badges, breadcrumbs, ghost annotations |
 | **M6: Publish & Distribute** | Upcoming | npm packages, VS Code Marketplace, CI, polished docs |
 
@@ -61,10 +61,31 @@ graph TD
 
 Both packages have test suites covering happy paths, edge cases, and error conditions. Example `.tourguide` files exist in `examples/` and `packages/core/tests/fixtures/`.
 
-**Known gaps to address in M1:**
-- `buildGraph` only indexes top-level `connections`, not per-step `connections` arrays — consumers may expect a unified graph
-- Traversal doesn't guard against empty chapters or empty tours (will throw on `firstPosition`)
-- Format schema may need adjustments as CLI and generation work reveals gaps
+**Known gaps addressed in M1:**
+- `buildGraph` now merges both top-level and per-step `connections` into a unified graph with deduplication
+- Traversal gracefully handles empty chapters (skips them) and empty tours (returns null positions)
+
+</details>
+
+<details>
+<summary><strong>M1: CLI Scaffold</strong> ✅ — CLI with validate/play/summary, hardened foundation</summary>
+
+**What was delivered:**
+
+`@tourguide/cli` provides a `tourguide` binary with three commands:
+
+- `tourguide validate <files...>` — loads and validates `.tourguide` files, reporting both schema and semantic errors with clear output
+- `tourguide summary <file>` — prints tour overview: title, description, mode, chapters with step counts, file map with relevance levels
+- `tourguide play <file>` — interactive terminal walkthrough: Enter/right-arrow advances, q quits. Displays chapter progress, step title, file path/range, description, and resolved code snippets. Raw mode stdin, non-TTY fallback.
+
+Built with commander.js and chalk. Output is pipe-friendly (colors auto-disabled when not a TTY). Proper `--help`, `--version`, and non-zero exit codes.
+
+Foundation fixes delivered alongside:
+- `buildGraph` in `@tourguide/core` now merges top-level and per-step connections with deduplication
+- Traversal handles empty chapters and empty tours gracefully
+- Injectable `Output` abstraction for testable CLI output
+
+Test suites cover all CLI commands and foundation fixes.
 
 </details>
 
@@ -72,75 +93,36 @@ Both packages have test suites covering happy paths, edge cases, and error condi
 
 ## Active and Upcoming Milestones
 
-## M1: CLI Scaffold
-
-**Status:** 🔵 Next up
-**Depends on:** M0
-**Goal:** Stand up `@tourguide/cli` with consumption commands (validate, play, summary) and harden the foundation packages where gaps are discovered.
-
-### Acceptance Criteria
-
-- [ ] `tourguide validate <file>` parses and validates a `.tourguide` file, reporting both schema errors (malformed JSON, missing fields, wrong types) and semantic errors (dangling chapter references, unknown annotation refs, broken connection endpoints) with clear, actionable output
-- [ ] `tourguide play <file>` presents the tour interactively in the terminal — Enter advances to the next step, q quits. Each step displays: chapter title and progress (e.g., "Chapter 2/4: Data Validation"), step number and total (e.g., "Step 3/12"), step title, file path and line range, and the step description. Chapter transitions are visually distinct.
-- [ ] `tourguide summary <file>` prints the tour overview: title, description, mode, summary text, chapter list with step counts, and the file map with relevance levels
-- [ ] `buildGraph` in `@tourguide/core` merges both top-level `connections` and per-step `connections` into a unified graph. Duplicate edges (same from/to/type) are deduplicated.
-- [ ] Traversal in `@tourguide/core` gracefully handles empty chapters (skip them) and empty tours (return null positions instead of throwing)
-- [ ] Proper `--help` for all commands, `--version` flag, non-zero exit codes on validation failure or file errors
-- [ ] All existing tests still pass; new tests cover CLI commands, buildGraph merge behavior, and traversal edge cases
-
-### Key Decisions
-
-- **CLI framework: commander.js.** Standard, lightweight, excellent documentation. The CLI is simple enough that heavier frameworks (yargs, oclif) add complexity without benefit. commander.js supports subcommands, options parsing, and auto-generated help out of the box.
-- **Terminal output: chalk for colors, pipe-friendly.** Output should be readable when piped to a file or another tool — disable colors when stdout is not a TTY (chalk does this automatically). No heavy TUI framework (ink, blessed). The terminal experience should be simple and reliable; the rich experience lives in VS Code.
-- **Play mode: Enter-to-advance with readline.** Not a full terminal UI. `process.stdin` in raw mode, Enter advances, q quits. Displays are printed sequentially (clear screen between steps or use separator lines — agent's choice based on what reads better). This keeps the implementation simple and avoids terminal compatibility issues.
-- **Package identity:** `@tourguide/cli` on npm, binary name `tourguide`. Registered in `package.json` under `"bin": { "tourguide": "./dist/cli.js" }`.
-- **Foundation fixes live in this milestone** because the CLI exercises the full format+core stack end-to-end. The `play` command exercises traversal. The `validate` command exercises schema + semantic validation. The graph merge fix ensures that tours with per-step connections (which the format explicitly supports) work correctly.
-
-### Context
-
-The CLI package doesn't exist yet. Create `packages/cli/` following the conventions established by `packages/format/` and `packages/core/`:
-
-- `tsconfig.json` extending `../../tsconfig.base.json` with project references to `../format` and `../core`
-- `package.json` with tsup build, vitest test script, workspace dependencies on `@tourguide/format` and `@tourguide/core`
-- Source in `src/`, tests in `tests/`
-- Biome for linting/formatting (inherits root `biome.json`)
-
-Test the CLI commands against the existing fixture files: `examples/sample.tourguide`, `packages/core/tests/fixtures/minimal.tourguide`, `packages/core/tests/fixtures/invalid.tourguide`.
-
----
-
 ## M2: Tour Generation
 
-**Status:** Upcoming
+**Status:** 🔵 Active
 **Depends on:** M1
-**Goal:** `tourguide generate --diff base..head` produces valid, meaningful `.tourguide` files from real git diffs. This is the first real-world test — generating a tour from an actual PR.
+**Design spec:** [`docs/superpowers/specs/2026-04-07-tour-generation-design.md`](superpowers/specs/2026-04-07-tour-generation-design.md)
+**Goal:** `tourguide generate --diff base..head` produces valid, meaningful `.tourguide` files from real git diffs using agentic LLM generation. This is the first real-world test — generating a tour from an actual PR.
 
 ### Acceptance Criteria
 
-- [ ] `tourguide generate --diff base..head` reads the git diff between two refs, runs structural analysis, calls the LLM, and outputs a valid `.tourguide` JSON document
-- [ ] Generated tours include: an overview with summary and file map, chapters grouping logically related changes, steps anchored to specific code ranges in the diff with descriptive titles and markdown descriptions, and connections between related steps
+- [ ] `tourguide generate --diff base..head` uses an agentic discovery loop (LLM with codebase tools) followed by a narration call to produce a valid `.tourguide` JSON document
+- [ ] Generated tours include: an overview with summary and file map, chapters grouping logically related changes, steps anchored to specific code ranges with descriptive titles and markdown descriptions, and connections between related steps
 - [ ] The generated output passes `tourguide validate` with no errors
 - [ ] Successfully generates a meaningful, well-organized, understandable tour from a real multi-file PR (not just a toy example)
-- [ ] The LLM provider and model are configurable via `--model` flag and/or `TOURGUIDE_MODEL` environment variable
-- [ ] Generation errors (git failures, LLM API errors, invalid LLM output) produce clear error messages and non-zero exit codes
+- [ ] Vendor-agnostic LLM integration via the Vercel AI SDK. Provider and model configurable via `--provider` and `--model` flags. Anthropic is the default provider.
+- [ ] Generation errors (git failures, LLM API errors, validation failure after retry) produce clear error messages and non-zero exit codes
 
 ### Key Decisions
 
-- **Two-phase pipeline: structural analysis → narration.** Phase 1 (structural analysis) is deterministic — no LLM. It parses the git diff output, extracts hunks grouped by file, identifies file roles (new, modified, deleted, renamed), reads file contents at both refs to understand context, and traces relationships between changed files (imports, function calls). It produces a structured JSON summary of the diff. Phase 2 (narration) sends this summary to an LLM along with the JSON Schema and instructions.
-- **The narration LLM has full creative agency.** The structural analysis provides the raw material: hunks, file relationships, module boundaries. But the narrating LLM is an author, not a formatter. It may reorganize material into chapters by conceptual theme rather than file boundary. It may skip or de-emphasize uninteresting changes (boilerplate, auto-generated code, trivial renames). It may group changes that span multiple files into a single narrative thread. It may add architectural context that the structural analysis can't derive. The goal is an engaging, understandable tour — not a mechanical walk through each hunk. The structural analysis tells the LLM what changed; the LLM decides how to explain it.
-- **LLM integration: Anthropic Claude API first.** Use the Anthropic TypeScript SDK (`@anthropic-ai/sdk`). Model configurable via `--model` flag (default: `claude-sonnet-4-20250514` or current best) or `TOURGUIDE_MODEL` env var. API key via `ANTHROPIC_API_KEY` env var. Start with a single model for the entire narration; multi-model cost optimization is M4.
-- **Prompt strategy: JSON Schema + structural analysis + clear intent.** The system prompt includes the full JSON Schema so the LLM knows the exact target structure. The user message includes the structural analysis output. The instructions emphasize: this tour is for comprehension (not code review), descriptions should explain *why* not just *what*, the LLM should organize for human understanding, and the output must be valid JSON matching the schema.
-- **Output: stdout by default, `--output` for file.** The full tour is generated, validated with `tourguide validate`, and then output. If the LLM produces invalid JSON or the tour fails validation, retry once. If it still fails, report the errors and exit non-zero. No streaming.
+- **Agentic discovery, not structural analysis.** No deterministic diff parsing or import tracing. The LLM receives the raw diff and explores the codebase autonomously using tools (read file at ref, search codebase, list directory, git log, git blame). It decides what's relevant. This produces better understanding than any heuristic we'd build, and naturally extends to codebase mode in M4.
+- **Two-call pipeline: discovery → narration.** Call 1 (`generateText` + tools): the model explores the codebase and produces a free-form synthesis of the changes. Call 2 (`generateObject` + `tourSchema`): the model receives the synthesis + raw diff + Zod schema and produces the tour as a validated object. Separating comprehension from structuring gives each call a clear objective.
+- **Vendor-agnostic via Vercel AI SDK.** The `ai` package provides a unified interface across providers (Anthropic, OpenAI, Google, etc.) with first-class tool use and structured output. Anthropic ships as a default dependency; other providers require installing their SDK package.
+- **The narrating LLM has full creative agency.** It may reorganize by conceptual theme, skip boilerplate, group cross-file changes into narrative threads, and add architectural context. The goal is an engaging, understandable tour — not a mechanical hunk walk-through.
+- **Output: stdout by default, `--output` for file.** Tour JSON to stdout, progress/warnings to stderr (pipeable). Validation + one retry on semantic errors. Best-effort output on retry failure (valid JSON with semantic warnings).
+- **Separate `packages/generate/` library.** The generation pipeline (`@tourguide/generate`) is a standalone library. The CLI's `generate` command is a thin wrapper. This keeps the library usable programmatically for future CI integration, VS Code, etc.
 
 ### Context
 
-This is the most complex milestone. It introduces two new capability areas:
+New package: `packages/generate/` with dependencies on `ai`, `@ai-sdk/anthropic`, and `@tourguide/format`. The CLI gets a new `generate` command wiring the library to flags.
 
-1. **Git integration** — parsing `git diff` output, reading file contents at specific refs (`git show ref:path`). The structural analysis needs to handle unified diff format, extract hunk headers, and identify file-level metadata (new/modified/deleted/renamed). Consider using a diff parsing library or writing a focused parser.
-
-2. **LLM API integration** — calling the Anthropic API, handling rate limits and errors, parsing the response as JSON. The prompt engineering is critical: the LLM needs enough context to produce a good tour but not so much that it exceeds context limits for large diffs.
-
-The `examples/sample.tourguide` file demonstrates the target output shape. Test with small diffs first (2-3 files), then scale to the real PR.
+The `examples/sample.tourguide` file demonstrates the target output shape. Test tools against a fixture git repo; gated LLM integration tests verify the full pipeline.
 
 ---
 
@@ -188,25 +170,27 @@ Test with hand-crafted `.tourguide` files from `examples/` and fixtures. If M2 i
 
 **Status:** Upcoming
 **Depends on:** M2
-**Goal:** Codebase mode, smarter prompts, resilient anchoring, multi-model cost optimization. Make generation more capable and more cost-efficient.
+**Goal:** Model tiering, codebase mode, feedback loop, large diff handling, pattern anchoring. Make generation smarter, cheaper, and more capable.
+
+M4 bundles generation milestones G2–G5 from the [generation design spec](superpowers/specs/2026-04-07-tour-generation-design.md).
 
 ### Acceptance Criteria
 
-- [ ] `tourguide generate --files src/api/ src/models/` works — explores existing code (no git diff), identifies key components, traces relationships, and generates a tour explaining the feature area
-- [ ] Generated steps include regex `pattern` fields anchored to unique code near the step's range, so tours survive minor line number shifts
-- [ ] Narration quality is measurably better: descriptions consistently explain *why* code exists, what would break without it, and how it connects to the bigger picture — not just what the code does
-- [ ] Multi-model option: `--analysis-model` and `--narration-model` flags allow using a cheaper model for structural analysis and a more capable model for narration
-- [ ] Large diffs (50+ files, 2000+ lines) are handled gracefully — chunked into manageable pieces, processed, and merged into a coherent single tour
+- [ ] **Model tiering (G2):** Discovery becomes a two-tier system — a frontier model (Opus-class) orchestrates and synthesizes, workhorse subagents (Sonnet/Haiku-class) execute targeted code reading and summarization. `--discovery-model` and `--narration-model` flags.
+- [ ] **Feedback loop (G3):** `--feedback "..."` flag lets the user improve a previous generation. Narration is re-run with the feedback; discovery is skipped by default, optionally re-run with `--rediscover`.
+- [ ] **Codebase mode (G4):** `tourguide generate --files src/api/ src/models/` explores existing code (no git diff) and generates a tour explaining the feature area. Same discovery loop, seeded with file contents. Output uses `mode: "codebase"`.
+- [ ] **Large diff handling (G5):** PRs exceeding context windows are handled via chunked discovery with merged synthesis, producing a coherent single tour.
+- [ ] **Pattern anchoring:** Generated steps include regex `pattern` fields anchored to unique code near the step's range, so tours survive minor line number shifts.
 
 ### Key Decisions
 
-- **Codebase mode: file listing + content analysis, no git diff.** The structural analysis reads file contents directly, identifies key components by kind (entry points, models, handlers, tests, configuration), and traces import/call relationships. The output has the same shape as diff mode's structural analysis, so the narration phase is unchanged.
-- **Pattern generation: extract unique code patterns near each step's range.** For each step, the generator looks at the code in and around the range and selects a regex pattern that uniquely identifies that location in the file. Patterns should be stable across minor edits (prefer function signatures, class names, distinctive string literals over line-specific content).
-- **Multi-model support:** `--analysis-model` defaults to a fast/cheap model, `--narration-model` defaults to a capable model. When only `--model` is specified, both phases use the same model. This lets users optimize cost: structure extraction doesn't need the best model, but narration quality benefits from it.
+- **Tiered discovery: frontier orchestrator + workhorse readers.** The frontier model never reads 2000-line files directly; it formulates targeted questions and receives focused summaries from cheaper subagents. This optimizes cost while maintaining high synthesis quality.
+- **Codebase mode reuses the same discovery loop.** The only difference is the seed: file contents instead of a diff. The narration call is identical.
+- **Pattern generation is a post-processing step.** After the tour is generated, a pass analyzes source files and adds `pattern` fields. Patterns prefer stable anchors: function signatures, class names, distinctive string literals.
 
 ### Context
 
-Builds directly on M2's generation pipeline. The two-phase architecture pays off here: codebase mode only changes Phase 1 (structural analysis), while Phase 2 (narration) works identically. Pattern generation is a post-processing step on the LLM output — after the tour is generated, a pass adds `pattern` fields by analyzing the source files.
+Builds directly on M2's agentic generation pipeline. The Vercel AI SDK's provider abstraction makes model tiering straightforward — the frontier and workhorse models can even be from different providers.
 
 ---
 
